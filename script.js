@@ -2,17 +2,20 @@ const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
-// Instructions de base pour l'IA (System Prompt)
+// Historique avec instructions strictes pour canaliser vers WhatsApp
 let conversationHistory = [
     { 
         role: "user", 
-        parts: [{ text: "Tu es l'agent commercial de FasoPropre. Ton unique mission est de collecter : 1. Nom, 2. Lieu, 3. Type de nettoyage. Sois bref et poli. Pose une question après l'autre. Une fois que tu as tout, affiche un résumé clair et termine obligatoirement par le code : [GENERER_WHATSAPP]. N'invente pas de prix sauf si demandé (Lessive 100f, Cuisine 5000f, Toilettes 750f/m2)." }] 
+        parts: [{ text: "Tu es l'assistant de FasoPropre. Ta mission : obtenir Nom, Ville, et Service souhaité. Règle : une seule question courte à la fois. N'invente rien. Dès que tu as les 3 infos, fais un résumé et termine par le code exact : [GENERER_WHATSAPP]. Sois poli 😊." }] 
+    },
+    {
+        role: "model",
+        parts: [{ text: "Entendu. Je vais aider le client à établir son devis étape par étape." }]
     }
 ];
 
-// Message d'accueil
 window.onload = () => {
-    setTimeout(() => typeEffect("Bonjour ! 😊 Bienvenue chez FasoPropre. Quel est votre nom pour débuter votre devis ?"), 500);
+    setTimeout(() => typeEffect("Bonjour ! 😊 Je suis l'assistant de FasoPropre. Quel est votre nom pour commencer ?"), 500);
 };
 
 async function handleChat() {
@@ -29,22 +32,24 @@ async function handleChat() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ history: conversationHistory })
         });
-        const data = await res.json();
         
-        if (data.text.includes("[GENERER_WHATSAPP]")) {
-            const cleanText = data.text.replace("[GENERER_WHATSAPP]", "").trim();
-            typeEffect(cleanText + "\n\n✅ Devis prêt ! Ouverture de WhatsApp...");
+        const data = await res.json();
+        const aiResponse = data.text;
+
+        if (aiResponse.includes("[GENERER_WHATSAPP]")) {
+            const cleanText = aiResponse.replace("[GENERER_WHATSAPP]", "").trim();
+            typeEffect(cleanText + "\n\n✅ Vos infos sont prêtes ! Je vous dirige vers WhatsApp...");
             
             setTimeout(() => {
-                const whatsappUrl = `https://wa.me/22660692928?text=${encodeURIComponent("Nouveau Devis FasoPropre :\n" + cleanText)}`;
-                window.open(whatsappUrl, '_blank');
+                const link = `https://wa.me/22660692928?text=${encodeURIComponent("Nouveau devis :\n" + cleanText)}`;
+                window.open(link, '_blank');
             }, 3000);
         } else {
-            typeEffect(data.text);
-            conversationHistory.push({ role: "model", parts: [{ text: data.text }] });
+            typeEffect(aiResponse);
+            conversationHistory.push({ role: "model", parts: [{ text: aiResponse }] });
         }
     } catch (err) {
-        addMessage("ai", "Désolé, je rencontre un problème technique. 😊");
+        typeEffect("Désolé, j'ai un souci de connexion. 😊");
     }
 }
 
@@ -64,7 +69,7 @@ function typeEffect(text) {
     function type() {
         if (i < text.length) {
             div.innerText += text.charAt(i); i++;
-            setTimeout(type, 20);
+            setTimeout(type, 15);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     }
