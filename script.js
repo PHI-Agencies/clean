@@ -2,20 +2,26 @@ const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
-// Historique avec instructions strictes pour canaliser vers WhatsApp
+// Ton prompt amélioré intégré comme instruction système
 let conversationHistory = [
     { 
         role: "user", 
-        parts: [{ text: "Tu es l'assistant de FasoPropre. Ta mission : obtenir Nom, Ville, et Service souhaité. Règle : une seule question courte à la fois. N'invente rien. Dès que tu as les 3 infos, fais un résumé et termine par le code exact : [GENERER_WHATSAPP]. Sois poli 😊." }] 
+        parts: [{ text: `Tu es CleanConnect, un assistant amical. 
+        MISSION : Collecter pas à pas : 1. Type de service, 2. Nom/Prénom, 3. WhatsApp client, 4. Ville/Quartier, 5. Détails techniques, 6. Fréquence.
+        RÈGLES : 
+        - Une seule question à la fois.
+        - Sois chaleureux (emojis 😊).
+        - Termine TOUJOURS par le code exact [GENERER_WHATSAPP] suivi du résumé complet une fois le point 6 validé.` }] 
     },
     {
         role: "model",
-        parts: [{ text: "Entendu. Je vais aider le client à établir son devis étape par étape." }]
+        parts: [{ text: "Bonjour et bienvenue sur CleanConnect ! 😊 Je suis ravi de vous aider. Pour commencer, quel type de service vous intéresse ? (maison, bureau, fin de chantier...)" }]
     }
 ];
 
+// Affichage du message de bienvenue initial
 window.onload = () => {
-    setTimeout(() => typeEffect("Bonjour ! 😊 Je suis l'assistant de FasoPropre. Quel est votre nom pour commencer ?"), 500);
+    addMessage("ai", "👋 Bonjour et bienvenue sur CleanConnect ! Je suis votre assistant pour trouver le service de nettoyage parfait. 😊 Pour commencer, quel type de service vous intéresse ?");
 };
 
 async function handleChat() {
@@ -38,10 +44,11 @@ async function handleChat() {
 
         if (aiResponse.includes("[GENERER_WHATSAPP]")) {
             const cleanText = aiResponse.replace("[GENERER_WHATSAPP]", "").trim();
-            typeEffect(cleanText + "\n\n✅ Vos infos sont prêtes ! Je vous dirige vers WhatsApp...");
+            typeEffect(cleanText + "\n\n✅ Devis prêt ! Ouverture de WhatsApp...");
             
             setTimeout(() => {
-                const link = `https://wa.me/22660692928?text=${encodeURIComponent("Nouveau devis :\n" + cleanText)}`;
+                // Redirection vers TON numéro 60692928
+                const link = `https://wa.me/22660692928?text=${encodeURIComponent("Nouveau Devis CleanConnect :\n" + cleanText)}`;
                 window.open(link, '_blank');
             }, 3000);
         } else {
@@ -49,7 +56,7 @@ async function handleChat() {
             conversationHistory.push({ role: "model", parts: [{ text: aiResponse }] });
         }
     } catch (err) {
-        typeEffect("Désolé, j'ai un souci de connexion. 😊");
+        typeEffect("Oups ! Une petite déconnexion. 😊");
     }
 }
 

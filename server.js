@@ -10,66 +10,65 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static(__dirname));
 
-// --- 1. Connexion à MongoDB ---
+// =====================
+// 1. MongoDB
+// =====================
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("✅ MongoDB Connecté"))
-    .catch(err => console.error("❌ Erreur MongoDB:", err));
+  .then(() => console.log("✅ MongoDB connecté"))
+  .catch(err => console.error("❌ MongoDB erreur :", err));
 
-// --- 2. Modèle de données ---
-const DevisSchema = new mongoose.Schema({
-    client: String,
-    details: String,
-    date: { type: Date, default: Date.now }
-});
-const Devis = mongoose.model('Devis', DevisSchema);
+// =====================
+// 2. Modèle
+// =====================
+const Devis = mongoose.model('Devis', new mongoose.Schema({
+  details: String,
+  date: { type: Date, default: Date.now }
+}));
 
-// --- 3. Route API Chat ---
+// =====================
+// 3. Route IA (CORRIGÉE)
+// =====================
 app.post('/api/chat', async (req, res) => {
-    try {
-        const { history } = req.body;
-        const API_KEY = process.env.GEMINI_API_KEY;
+  try {
+    const { history } = req.body;
+    const API_KEY = process.env.GEMINI_API_KEY;
 
-        if (!API_KEY) {
-            return res.status(500).json({ error: "Clé API Gemini manquante" });
-        }
-
-        // --- Transformer l'historique en prompt ---
-        const prompt = history
-            .map(h => h.parts.map(p => p.text).join(" "))
-            .join("\n");
-
-        // --- URL du modèle stable ---
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/text-bison-001:generateText?key=${API_KEY}`;
-
-        const response = await axios.post(url, {
-            prompt: prompt,
-            temperature: 0.7,
-            max_output_tokens: 500
-        });
-
-        if (!response.data.candidates || response.data.candidates.length === 0) {
-            return res.status(500).json({ error: "Réponse vide de l'IA" });
-        }
-
-        const aiText = response.data.candidates[0].content;
-
-        // --- Sauvegarde si le texte contient la commande finale ---
-        if (aiText.includes("[FINAL]")) {
-            const cleanText = aiText.replace("[FINAL]", "").trim();
-            await new Devis({
-                client: "Client FasoPropre", // tu peux extraire le nom avec l'IA plus tard
-                details: cleanText
-            }).save();
-        }
-
-        res.json({ text: aiText });
-
-    } catch (error) {
-        console.error("Erreur Gemini:", error.response ? error.response.data : error.message);
-        res.status(500).json({ error: "Erreur lors de l'appel à Gemini" });
+    if (!API_KEY) {
+      return res.status(500).json({ error: "Clé Gemini absente" });
     }
+
+    const url =
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+    const response = await axios.post(url, {
+      contents: history
+    }, {
+      timeout: 15000 // ⏱ évite le blocage Render
+    });
+
+    const aiText =
+      response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!aiText) {
+      return res.status(500).json({ error: "Réponse IA vide" });
+    }
+
+    if (aiText.includes("[GENERER_WHATSAPP]")) {
+      await new Devis({ details: aiText }).save();
+    }
+
+    res.json({ text: aiText });
+
+  } catch (err) {
+    console.error("❌ Gemini erreur :", err.response?.data || err.message);
+    res.status(500).json({ error: "Erreur IA Gemini" });
+  }
 });
 
-// --- 4. Démarrage du serveur ---
+// =====================
+// 4. Serveur
+// =====================
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Serveur actif sur le port ${PORT}`));
+app.listen(PORT, () =>
+  console.log(`🚀 Serveur actif sur le port ${PORT}`)
+);
