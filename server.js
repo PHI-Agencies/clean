@@ -15,9 +15,8 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Clé Gemini depuis Render (via Dashboard)
+// Clé Gemini depuis Render Environment
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
 if (!GEMINI_API_KEY) {
     console.warn("⚠️ GEMINI_API_KEY non définie !");
 }
@@ -27,6 +26,8 @@ app.post("/api/chat", async (req, res) => {
     try {
         const userMessage = req.body.message;
         if (!userMessage) return res.status(400).json({ reply: "Message vide." });
+
+        console.log("Message reçu :", userMessage);
 
         const prompt = `
 Tu es ZakaSania, un assistant IA pour une entreprise de services à domicile.
@@ -52,6 +53,8 @@ ${userMessage}
         );
 
         const data = await response.json();
+        console.log("Réponse brute Gemini :", data);
+
         const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Désolé, je ne peux pas répondre pour le moment.";
 
         res.json({ reply });

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>ZakaSania | Assistant IA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <style>
         body {
             margin: 0;
@@ -16,7 +15,6 @@
             align-items: center;
             height: 100vh;
         }
-
         .chat-container {
             width: 100%;
             max-width: 420px;
@@ -27,41 +25,22 @@
             flex-direction: column;
             overflow: hidden;
         }
-
         .chat-header {
             padding: 15px;
             text-align: center;
             background: linear-gradient(135deg, #2563eb, #3b82f6);
             font-weight: 700;
         }
-
         .chat-messages {
             flex: 1;
             padding: 15px;
             overflow-y: auto;
             font-size: 0.9rem;
         }
-
-        .msg {
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }
-
-        .user {
-            text-align: right;
-            color: #93c5fd;
-        }
-
-        .bot {
-            text-align: left;
-            color: #e5e7eb;
-        }
-
-        .chat-input {
-            display: flex;
-            border-top: 1px solid rgba(255,255,255,.1);
-        }
-
+        .msg { margin-bottom: 12px; line-height: 1.4; }
+        .user { text-align: right; color: #93c5fd; }
+        .bot { text-align: left; color: #e5e7eb; }
+        .chat-input { display: flex; border-top: 1px solid rgba(255,255,255,.1); }
         textarea {
             flex: 1;
             border: none;
@@ -72,7 +51,6 @@
             color: #fff;
             font-size: 0.9rem;
         }
-
         button {
             border: none;
             background: #2563eb;
@@ -81,21 +59,13 @@
             cursor: pointer;
             font-weight: 600;
         }
-
-        button:hover {
-            background: #1d4ed8;
-        }
+        button:hover { background: #1d4ed8; }
     </style>
 </head>
 <body>
-
 <div class="chat-container">
-    <div class="chat-header">
-        ZakaSania • Assistant IA
-    </div>
-
+    <div class="chat-header">ZakaSania • Assistant IA</div>
     <div class="chat-messages" id="chat"></div>
-
     <div class="chat-input">
         <textarea id="userInput" rows="1" placeholder="Posez votre question..."></textarea>
         <button onclick="sendMessage()">Envoyer</button>
@@ -122,7 +92,8 @@ async function sendMessage() {
     input.value = "";
 
     try {
-        const res = await fetch("http://localhost:3000/api/chat", {
+        // 🔑 URL relative pour Render
+        const res = await fetch("/api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message })
@@ -132,10 +103,10 @@ async function sendMessage() {
         addMessage(data.reply, "bot");
 
     } catch (err) {
+        console.error(err);
         addMessage("Erreur de connexion au serveur.", "bot");
     }
 }
 </script>
-
 </body>
 </html>
