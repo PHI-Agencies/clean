@@ -3,47 +3,65 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import { MongoClient } from "mongodb";
+import fetch from "node-fetch"; // Assurez-vous d'avoir "node-fetch" dans votre package.json
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- __dirname ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- MongoDB Native ---
+// --- MongoDB Native avec Gestion de Connexion ---
 const client = new MongoClient(process.env.MONGODB_URI);
 let db;
 
-async function connectDB() {
-  try {
-    await client.connect();
-    db = client.db(); // DB par défaut de l’URI
-    console.log("✅ Connecté à MongoDB (native)");
-  } catch (err) {
-    console.error("❌ Erreur MongoDB:", err);
+async function getDB() {
+  if (!db) {
+    try {
+      await client.connect();
+      // On force le nom de la base pour être certain de ne pas écrire dans 'test' par défaut
+      db = client.db("zakasania_db"); 
+      console.log("✅ Connecté à MongoDB Atlas");
+    } catch (err) {
+      console.error("❌ Erreur de connexion MongoDB:", err.message);
+      return null;
+    }
   }
+  return db;
 }
-connectDB();
+
+// Initialisation au démarrage
+getDB();
 
 // --- API Enregistrement Client ---
 app.post("/api/register", async (req, res) => {
   try {
-    const { name, phone } = req.body;
-    if (!name || !phone) {
-      return res.status(400).json({ success: false });
+    const database = await getDB();
+    if (!database) {
+      return res.status(500).json({ success: false, error: "Base de données non disponible" });
     }
 
-    await db.collection("clients").insertOne({
-      name,
-      phone,
+    const { name, phone } = req.body;
+    if (!name || !phone) {
+      return res.status(400).json({ success: false, message: "Nom et téléphone requis" });
+    }
+
+    // Nettoyage des données
+    const cleanName = name.trim();
+    const cleanPhone = phone.trim();
+
+    const result = await database.collection("clients").insertOne({
+      name: cleanName,
+      phone: cleanPhone,
       createdAt: new Date()
     });
 
+    console.log(`👤 Client enregistré : ${cleanName}`);
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ success: false });
+    console.error("❌ Erreur d'enregistrement:", err);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
@@ -56,10 +74,9 @@ app.post("/api/chat", async (req, res) => {
     }
 
     const prompt = `
-Tu es ZakaSania, un assistant IA pour une entreprise de services à domicile.
-Tu réponds simplement, clairement et poliment.
-Tu parles toujours en français.
-Réponses courtes.
+Tu es ZakaSania, un assistant IA pour une entreprise de services à domicile au Burkina Faso.
+Tu réponds simplement, clairement et poliment. Tu es expert en nettoyage.
+Tu parles toujours en français. Réponses courtes et efficaces.
 
 Question :
 ${userMessage}
@@ -71,34 +88,26 @@ ${userMessage}
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: prompt }]
-            }
-          ]
+          contents: [{ parts: [{ text: prompt }] }]
         })
       }
     );
 
     const data = await response.json();
-
-    const reply =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Désolé, je ne peux pas répondre pour le moment.";
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Désolé, je ne peux pas répondre pour le moment.";
 
     res.json({ reply });
-
   } catch (error) {
     console.error("Erreur Gemini:", error);
-    res.status(500).json({ reply: "Erreur serveur." });
+    res.status(500).json({ reply: "Erreur lors de la communication avec l'IA." });
   }
 });
 
 // --- Frontend ---
 app.use(express.static(__dirname));
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
+app.get("/assistant.html", (req, res) => res.sendFile(path.join(__dirname, "assistant.html")));
+app.get("/avis.html", (req, res) => res.sendFile(path.join(__dirname, "avis.html")));
 
 // --- Server ---
 const PORT = process.env.PORT || 3000;
