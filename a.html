@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZakaSania | Service Lessive</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .form-container {
+            background: #ffffff;
+            border-radius: 30px;
+            padding: 25px 15px;
+            margin: 15px auto;
+            max-width: 450px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+
+        .form-header { text-align: center; margin-bottom: 20px; }
+        .form-header h1 { font-size: 1.4rem; color: #2f3640; font-weight: 700; }
+        .form-header span { color: #00a8ff; }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .item-card {
+            padding: 15px 5px;
+            border-radius: 20px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .bg-light { background: #e3f2fd; } 
+        .bg-heavy { background: #f3e5f5; } 
+        .bg-curtain { background: #e8f5e9; } 
+        .bg-sheet { background: #fff3e0; } 
+
+        .item-card label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #2f3640;
+            text-transform: uppercase;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        input[type="number"], input[type="date"], input[type="time"] {
+            -moz-appearance: textfield;
+            border: none;
+            background: white;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: #2f3640;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            outline: none;
+        }
+
+        input[type="number"] { width: 60px; padding: 8px; font-size: 1.1rem; }
+
+        /* Grille 2x2 pour Date et Heure */
+        .datetime-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .dt-card { background: #f1f2f6; padding: 12px; border-radius: 18px; }
+        .dt-card label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
+        
+        input[type="date"], input[type="time"] {
+            width: 100%;
+            padding: 8px;
+            font-size: 0.85rem;
+        }
+
+        .notes-group { margin-top: 15px; }
+        .notes-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; }
+        
+        textarea {
+            width: 100%;
+            height: 70px;
+            padding: 12px;
+            border-radius: 15px;
+            border: 2px solid #f1f2f6;
+            background: #f8f9fa;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+        }
+
+        .btn-whatsapp {
+            width: 100%;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-back { text-decoration: none; color: #7f8c8d; font-weight: 600; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="container">
+            <div class="logo">Zaka<span>Sania</span></div>
+            <a href="index.html" class="btn-back">← Retour</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h1>Ma Lessive <span>ZakaSania</span></h1>
+            </div>
+
+            <form id="lessiveForm">
+                <div class="items-grid">
+                    <div class="item-card bg-light">
+                        <label>👚 Légers</label>
+                        <input type="number" id="legers" placeholder="0">
+                    </div>
+                    <div class="item-card bg-heavy">
+                        <label>👖 Lourds</label>
+                        <input type="number" id="lourds" placeholder="0">
+                    </div>
+                    <div class="item-card bg-curtain">
+                        <label>🖼️ Rideaux</label>
+                        <input type="number" id="rideaux" placeholder="0">
+                    </div>
+                    <div class="item-card bg-sheet">
+                        <label>🛏️ Draps</label>
+                        <input type="number" id="draps" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="datetime-grid">
+                    <div class="dt-card">
+                        <label>📅 Date</label>
+                        <input type="date" id="date_service">
+                    </div>
+                    <div class="dt-card">
+                        <label>⏰ Heure</label>
+                        <input type="time" id="heure_service">
+                    </div>
+                </div>
+
+                <div class="notes-group">
+                    <label for="notes">Indications particulières</label>
+                    <textarea id="notes" placeholder="Ex: Fragile, taches, repassage..."></textarea>
+                </div>
+
+                <button type="button" onclick="envoyerWhatsApp()" class="btn-whatsapp">
+                    Réserver sur WhatsApp
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        function envoyerWhatsApp() {
+            const legers = document.getElementById('legers').value || 0;
+            const lourds = document.getElementById('lourds').value || 0;
+            const rideaux = document.getElementById('rideaux').value || 0;
+            const draps = document.getElementById('draps').value || 0;
+            
+            const dateS = document.getElementById('date_service').value;
+            const heureS = document.getElementById('heure_service').value;
+            const notes = document.getElementById('notes').value || "Aucune";
+
+            if (legers == 0 && lourds == 0 && rideaux == 0 && draps == 0) {
+                alert("Veuillez saisir au moins un article.");
+                return;
+            }
+
+            if (!dateS || !heureS) {
+                alert("Veuillez choisir une date et une heure.");
+                return;
+            }
+
+            const numero = "22660692928";
+            let details = "";
+            if (legers > 0) details += `✅ Légers : ${legers}%0A`;
+            if (lourds > 0) details += `✅ Lourds : ${lourds}%0A`;
+            if (rideaux > 0) details += `✅ Rideaux : ${rideaux}%0A`;
+            if (draps > 0) details += `✅ Draps : ${draps}%0A`;
+
+            const message = `*COMMANDE LESSIVE ZAKASANIA*%0A%0A` +
+                            `*Quantités :*%0A${details}%0A` +
+                            `*RDV souhaité :* Le ${dateS} à ${heureS}%0A` +
+                            `*Note :* ${notes}`;
+
+            window.open(`https://wa.me/${numero}?text=${message}`, '_blank');
+        }
+    </script>
+
+</body>
+</html>

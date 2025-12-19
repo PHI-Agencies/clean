@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZakaSania | Autres Services</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .form-container {
+            background: #ffffff;
+            border-radius: 30px;
+            padding: 25px 15px;
+            margin: 15px auto;
+            max-width: 450px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+
+        .form-header { text-align: center; margin-bottom: 20px; }
+        .form-header h1 { font-size: 1.4rem; color: #2f3640; font-weight: 700; }
+
+        /* Grille de sélection cliquable */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .item-check { position: relative; }
+        .item-check input { display: none; } /* On cache la case à cocher réelle */
+
+        .check-card {
+            display: block;
+            padding: 15px 5px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 2px solid transparent;
+            text-transform: uppercase;
+            color: #2f3640;
+        }
+
+        /* Couleurs par défaut */
+        .bg-garden { background: #e8f5e9; }
+        .bg-event { background: #fff3e0; }
+        .bg-staff { background: #f3e5f5; }
+        .bg-carpet { background: #e1f5fe; }
+
+        /* État quand on clique (Sélectionné) */
+        .item-check input:checked + .check-card {
+            border-color: #00a8ff;
+            transform: scale(0.95);
+            background: #00a8ff;
+            color: white;
+        }
+
+        /* Champ Service Autre */
+        .other-field {
+            margin-bottom: 20px;
+        }
+        .other-field input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px dashed #ddd;
+            background: #fafafa;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .datetime-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .dt-card { background: #f1f2f6; padding: 12px; border-radius: 18px; }
+        .dt-card label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
+        
+        input[type="date"], input[type="time"] {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            background: white;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .notes-group { margin-top: 15px; }
+        .notes-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; }
+        
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 12px;
+            border-radius: 15px;
+            border: 2px solid #f1f2f6;
+            background: #f8f9fa;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+        }
+
+        .btn-whatsapp {
+            width: 100%;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-back { text-decoration: none; color: #7f8c8d; font-weight: 600; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="container">
+            <div class="logo">Zaka<span>Sania</span></div>
+            <a href="index.html" class="btn-back">← Retour</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h1>Services <span>Spécifiques</span></h1>
+            </div>
+
+            <form id="autresForm">
+                <div class="items-grid">
+                    <label class="item-check">
+                        <input type="checkbox" name="service" value="Jardin / Extérieur">
+                        <span class="check-card bg-garden">🌳 Jardin</span>
+                    </label>
+                    <label class="item-check">
+                        <input type="checkbox" name="service" value="Aide Événement">
+                        <span class="check-card bg-event">🎉 Événement</span>
+                    </label>
+                    <label class="item-check">
+                        <input type="checkbox" name="service" value="Personnel d'appui">
+                        <span class="check-card bg-staff">👥 Appui</span>
+                    </label>
+                    <label class="item-check">
+                        <input type="checkbox" name="service" value="Tapis / Moquettes">
+                        <span class="check-card bg-carpet">🧹 Tapis</span>
+                    </label>
+                </div>
+
+                <div class="other-field">
+                    <input type="text" id="service_perso" placeholder="Autre service non mentionné ? Tapez ici...">
+                </div>
+
+                <div class="datetime-grid">
+                    <div class="dt-card">
+                        <label>📅 Date</label>
+                        <input type="date" id="date_service">
+                    </div>
+                    <div class="dt-card">
+                        <label>⏰ Heure</label>
+                        <input type="time" id="heure_service">
+                    </div>
+                </div>
+
+                <div class="notes-group">
+                    <label for="notes">Détails de votre demande</label>
+                    <textarea id="notes" placeholder="Décrivez ici les détails pour nous aider à préparer votre devis..."></textarea>
+                </div>
+
+                <button type="button" onclick="envoyerWhatsApp()" class="btn-whatsapp">
+                    Demander mon devis WhatsApp
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        function envoyerWhatsApp() {
+            // Récupération des services cochés
+            const cochez = [];
+            document.querySelectorAll('input[name="service"]:checked').forEach((el) => {
+                cochez.push(el.value);
+            });
+
+            const servicePerso = document.getElementById('service_perso').value;
+            const dateS = document.getElementById('date_service').value;
+            const heureS = document.getElementById('heure_service').value;
+            const notes = document.getElementById('notes').value || "Aucune précision supplémentaire";
+
+            if (cochez.length === 0 && !servicePerso) {
+                alert("Veuillez sélectionner un service ou saisir votre besoin.");
+                return;
+            }
+
+            if (!dateS || !heureS) {
+                alert("Veuillez choisir une date et une heure.");
+                return;
+            }
+
+            const numero = "22660692928";
+            let texteServices = cochez.join(", ");
+            if (servicePerso) texteServices += (texteServices ? " + " : "") + servicePerso;
+
+            const message = `*ZAKASANIA - DEMANDE SUR-MESURE*%0A%0A` +
+                            `*Services choisis :* ${texteServices}%0A` +
+                            `*RDV souhaité :* Le ${dateS} à ${heureS}%0A` +
+                            `*Détails :* ${notes}`;
+
+            window.open(`https://wa.me/${numero}?text=${message}`, '_blank');
+        }
+    </script>
+
+</body>
+</html>

@@ -1,53 +1,88 @@
-:root{
---primary-blue:#0056b3;
---secondary-blue:#00a8e8;
---dark-blue:#003366;
---text-color:#33475b;
---white:#ffffff;
---shadow:0 10px 30px rgba(0,0,0,0.08);
---transition:all 0.3s cubic-bezier(0.25,0.8,0.25,1);
---ai-green:#10a37f;
+/* Variables */
+:root {
+    --primary: #00a8ff;
+    --dark: #2f3640;
+    --light: #f5f6fa;
+    --white: #ffffff;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;color:var(--text-color);line-height:1.6;background:var(--white);overflow-x:hidden;}
-header{background:var(--white);padding:1.2rem 5%;position:fixed;width:100%;top:0;z-index:1000;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
-nav{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;}
-.logo{font-size:1.6rem;font-weight:800;color:var(--dark-blue);}
-.logo span{color:var(--secondary-blue);}
-.nav-list{display:flex;list-style:none;align-items:center;}
-.nav-list li{margin-left:2.5rem;}
-.nav-list li a{text-decoration:none;color:var(--text-color);font-weight:600;transition:var(--transition);}
-.nav-list li a:hover{color:var(--primary-blue);}
-.cta-nav{background:var(--primary-blue);color:white;border:none;padding:.8rem 1.8rem;border-radius:50px;cursor:pointer;font-weight:600;transition:var(--transition);}
-.hero{height:80vh;background:linear-gradient(120deg,#fdfbfb 0%,#ebedee 100%);display:flex;align-items:center;justify-content:center;padding:0 5%;text-align:center;}
-.hero h1{font-size:clamp(2.5rem,8vw,4rem);color:var(--dark-blue);margin-bottom:1.5rem;font-weight:800;}
-.hero h1 span{color:var(--secondary-blue);}
-.hero-btns{display:flex;gap:20px;justify-content:center;margin-top:2rem;}
-.btn-main,.btn-secondary{text-decoration:none;padding:1rem 2.5rem;border-radius:8px;font-weight:700;transition:var(--transition);}
-.btn-main{background:var(--primary-blue);color:white;}
-.btn-secondary{border:2px solid var(--primary-blue);color:var(--primary-blue);}
-.services{padding:100px 5%;max-width:1200px;margin:0 auto;}
-.section-title{text-align:center;font-size:2.5rem;margin-bottom:50px;color:var(--dark-blue);}
-.services-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;}
-.card{padding:40px;background:var(--white);border-radius:15px;box-shadow:var(--shadow);text-align:center;border:1px solid #eee;opacity:0;transform:translateY(30px);transition:all .6s ease-out;}
-.ai-section{padding:50px 5%;display:flex;justify-content:center;}
-.chat-interface{width:100%;max-width:800px;height:650px;background:var(--white);border-radius:24px;display:flex;flex-direction:column;box-shadow:var(--shadow);border:1px solid #e5e5e5;overflow:hidden;}
-.chat-header-ai{padding:20px 30px;background:var(--white);border-bottom:1px solid #eee;}
-.ai-status{display:flex;align-items:center;gap:12px;}
-.ai-emoji{font-size:1.5rem;background:#e7f3ff;width:45px;height:45px;display:flex;align-items:center;justify-content:center;border-radius:12px;}
-.online-dot{width:10px;height:10px;background:var(--ai-green);border-radius:50%;display:inline-block;}
-.chat-body{flex:1;padding:30px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;}
-.message{max-width:85%;padding:12px 16px;border-radius:18px;font-size:1rem;line-height:1.4;word-wrap:break-word;}
-.ai{align-self:flex-start;background:#f0f4f9;color:var(--dark-blue);border-bottom-left-radius:4px;}
-.user{align-self:flex-end;background:var(--primary-blue);color:white;border-bottom-right-radius:4px;}
-.chat-footer{padding:25px 30px;background:var(--white);border-top:1px solid #eee;}
-.input-wrapper{display:flex;align-items:center;background:#f4f7f9;padding:10px 18px;border-radius:16px;border:1px solid #ddd;transition:var(--transition);}
-.input-wrapper:focus-within{border-color:var(--secondary-blue);background:var(--white);}
-#user-input{flex:1;border:none;background:transparent;outline:none;font-size:1rem;padding:5px;}
-#send-btn{background:var(--primary-blue);color:white;border:none;padding:10px 20px;border-radius:10px;cursor:pointer;font-weight:bold;margin-left:10px;}
-.footer-note{text-align:center;font-size:.75rem;color:#999;margin-top:12px;}
-.menu-toggle{display:none;cursor:pointer;}
-@media(max-width:768px){.menu-toggle{display:flex;flex-direction:column;gap:5px}.nav-list{position:fixed;top:0;right:-100%;flex-direction:column;background:var(--white);width:80%;height:100vh;justify-content:center;transition:.4s ease;box-shadow:-10px 0 20px rgba(0,0,0,0.05);}.nav-list.active{right:0}.nav-list li{margin:1.5rem 0}.hero h1{font-size:2.2rem}.chat-interface{height:550px;}}
-@media(max-width:600px){.ai-section{padding:10px 5%}.chat-interface{height:85vh;border-radius:12px}.message{max-width:92%;font-size:.95rem;padding:10px 14px}.chat-header-ai{padding:12px 15px}.ai-emoji{width:35px;height:35px;font-size:1.2rem}.chat-footer{padding:12px}.input-wrapper{padding:8px 12px}#send-btn{padding:8px 12px;font-size:.9rem}}
-.no-scroll{overflow:hidden;}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; background-color: var(--light); color: var(--dark); line-height: 1.6; scroll-behavior: smooth; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 15px; }
+
+/* Header */
+header { background: var(--white); padding: 15px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+nav { display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.5rem; font-weight: 700; }
+.logo span { color: var(--primary); }
+.nav-links { display: flex; list-style: none; gap: 15px; align-items: center; }
+.nav-links a { text-decoration: none; color: var(--dark); font-weight: 600; font-size: 0.9rem; }
+.btn-nav { background: var(--primary); color: var(--white) !important; padding: 6px 15px; border-radius: 50px; }
+
+/* Hero */
+.hero { height: 50vh; background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url('https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1000'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; text-align: center; }
+.hero h1 { font-size: 2rem; line-height: 1.2; }
+.hero h1 span { color: var(--primary); }
+.btn-main { display: inline-block; background: var(--primary); color: var(--white); padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: 600; margin-top: 20px; }
+
+/* Grille 2x2 FORCÉE */
+.section-title { text-align: center; margin: 40px 0 20px; font-size: 1.5rem; }
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 colonnes forcées */
+    gap: 15px;
+    margin-bottom: 50px;
+}
+
+/* La Boîte unique cliquable */
+.service-block-link {
+    background: var(--white);
+    padding: 20px 10px;
+    border-radius: 20px;
+    text-align: center;
+    text-decoration: none; /* Enlève le soulignement du lien */
+    color: var(--dark);
+    border: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.service-block-link:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+}
+
+.service-block-link .icon { font-size: 2.5rem; margin-bottom: 10px; }
+.service-block-link h3 { font-size: 1.1rem; margin-bottom: 5px; color: var(--dark); }
+.service-block-link p { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 15px; flex-grow: 1; }
+
+/* Le bouton à l'intérieur */
+.action-btn {
+    background: var(--white);
+    color: var(--primary);
+    padding: 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    border: 2px solid var(--primary);
+    transition: 0.3s;
+}
+
+.service-block-link:hover .action-btn {
+    background: var(--primary);
+    color: var(--white);
+}
+
+/* Footer */
+footer { background: var(--dark); color: var(--white); padding: 25px 0; text-align: center; font-size: 0.8rem; }
+
+/* Désactivation du passage à 1 colonne sur mobile */
+@media (max-width: 768px) {
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

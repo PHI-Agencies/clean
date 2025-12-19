@@ -3,55 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assistant IA</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #chat-container { width: 400px; height: 500px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
-        #messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .message { padding: 10px; border-radius: 8px; max-width: 80%; }
-        .user { background: #007bff; color: white; align-self: flex-end; }
-        .ai { background: #e9e9eb; color: black; align-self: flex-start; }
-        #input-area { display: flex; border-top: 1px solid #ddd; }
-        input { flex: 1; padding: 15px; border: none; outline: none; }
-        button { padding: 15px; background: #007bff; color: white; border: none; cursor: pointer; }
-    </style>
+    <title>ZakaSania | Excellence en Propreté</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <header>
+        <nav class="container">
+            <div class="logo">Zaka<span>Sania</span></div>
+            <ul class="nav-links">
+                <li><a href="#accueil">Accueil</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#" class="btn-nav">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<div id="chat-container">
-    <div id="messages"></div>
-    <div id="input-area">
-        <input type="text" id="userInput" placeholder="Écrivez votre message...">
-        <button onclick="sendMessage()">Envoyer</button>
-    </div>
+    <main>
+        <section id="accueil" class="hero">
+            <div class="hero-content">
+                <h1>Une maison saine, <br>un esprit serein avec <span>ZakaSania</span></h1>
+                <p>Le meilleur du nettoyage professionnel au Burkina Faso.</p>
+                <a href="#services" class="btn-main">Découvrir nos services</a>
+            </div>
+        </section>
+
+        <section id="services" class="container">
+            <h2 class="section-title">Quel service recherchez-vous ?</h2>
+            <div class="services-grid">
+                
+                <a href="a.html" class="service-block-link">
+                    <div class="icon">🧺</div>
+                    <h3>Lessive</h3>
+                    <p>Vêtements, linge de maison et repassage.</p>
+                    <div class="action-btn">Demander ce service</div>
+                </a>
+
+                <a href="b.html" class="service-block-link">
+                    <div class="icon">🏠</div>
+                    <h3>Maisons & Locaux</h3>
+                    <p>Entretien complet et fin de chantier.</p>
+                    <div class="action-btn">Demander ce service</div>
+                </a>
+
+                <a href="c.html" class="service-block-link">
+                    <div class="icon">🍽️</div>
+                    <h3>Cuisine & Vaisselle</h3>
+                    <p>Nettoyage approfondi et aide ménagère.</p>
+                    <div class="action-btn">Demander ce service</div>
+                </a>
+
+                <a href="d.html" class="service-block-link">
+                    <div class="icon">✨</div>
+                    <h3>Autres</h3>
+                    <p>Demandes spécifiques et sur-mesure.</p>
+                    <div class="action-btn">Demander ce service</div>
+                </a>
+
+            </div>
+            <div class="ai-floating-button">
+    <a href="IA.html" class="ai-btn">
+        <span class="ai-icon">✨</span>
+        <span class="ai-text">Assistant IA</span>
+    </a>
 </div>
 
-<script>
-    async function sendMessage() {
-        const input = document.getElementById('userInput');
-        const text = input.value;
-        if (!text) return;
-
-        appendMessage(text, 'user');
-        input.value = '';
-
-        const response = await fetch('https://clean-qdah.onrender.com/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
-        });
-        
-        const data = await response.json();
-        appendMessage(data.reply, 'ai');
+<style>
+    .ai-floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
     }
 
-    function appendMessage(text, side) {
-        const div = document.createElement('div');
-        div.className = `message ${side}`;
-        div.innerText = text;
-        document.getElementById('messages').appendChild(div);
-        document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+    .ai-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #1e272e 0%, #2f3640 100%);
+        color: white;
+        text-decoration: none;
+        padding: 12px 20px;
+        border-radius: 50px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        border: 1px solid rgba(0, 168, 255, 0.3);
+        transition: 0.3s;
     }
-</script>
+
+    .ai-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 168, 255, 0.2);
+        border-color: #00a8ff;
+    }
+
+    .ai-icon {
+        font-size: 1.2rem;
+        animation: spark 2s infinite;
+    }
+
+    @keyframes spark {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.2); }
+    }
+
+    /* Masquer le bouton sur les petits écrans si nécessaire ou le centrer */
+    @media (max-width: 480px) {
+        .ai-btn {
+            padding: 10px 15px;
+            font-size: 0.8rem;
+        }
+    }
+</style>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ZakaSania - Services de Nettoyage Professionnel.</p>
+        </div>
+    </footer>
 </body>
 </html>
