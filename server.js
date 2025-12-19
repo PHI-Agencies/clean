@@ -2,29 +2,30 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import mongoose from "mongoose";
+import { MongoClient } from "mongodb";
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-// --- Fix __dirname en ES module ---
+// --- __dirname ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- MongoDB Atlas ---
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log("✅ Connecté à MongoDB Atlas"))
-  .catch(err => console.error("❌ Erreur MongoDB :", err));
+// --- MongoDB Native ---
+const client = new MongoClient(process.env.MONGODB_URI);
+let db;
 
-const ClientSchema = new mongoose.Schema({
-  name: String,
-  phone: String,
-  date: { type: Date, default: Date.now }
-});
-
-const Client = mongoose.model("Client", ClientSchema);
+async function connectDB() {
+  try {
+    await client.connect();
+    db = client.db(); // DB par défaut de l’URI
+    console.log("✅ Connecté à MongoDB (native)");
+  } catch (err) {
+    console.error("❌ Erreur MongoDB:", err);
+  }
+}
+connectDB();
 
 // --- API Enregistrement Client ---
 app.post("/api/register", async (req, res) => {
@@ -34,8 +35,11 @@ app.post("/api/register", async (req, res) => {
       return res.status(400).json({ success: false });
     }
 
-    const newClient = new Client({ name, phone });
-    await newClient.save();
+    await db.collection("clients").insertOne({
+      name,
+      phone,
+      createdAt: new Date()
+    });
 
     res.json({ success: true });
   } catch (err) {
@@ -52,7 +56,7 @@ app.post("/api/chat", async (req, res) => {
     }
 
     const prompt = `
-Tu es ZakaSania, un assistant IA pour des services à domicile.
+Tu es ZakaSania, un assistant IA pour une entreprise de services à domicile.
 Tu réponds simplement, clairement et poliment.
 Tu parles toujours en français.
 Réponses courtes.
@@ -77,7 +81,6 @@ ${userMessage}
     );
 
     const data = await response.json();
-    console.log("Gemini:", JSON.stringify(data));
 
     const reply =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
@@ -97,6 +100,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
+// --- Server ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ ZakaSania actif sur le port ${PORT}`);
