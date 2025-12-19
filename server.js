@@ -1,38 +1,31 @@
 const express = require('express');
 const cors = require('cors');
-const axios = require('axios');
-require('dotenv').config();
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
-app.use(express.json());
 app.use(cors());
-app.use(express.static(__dirname));
+app.use(express.json());
 
-app.post('/api/chat', async (req, res) => {
-  try {
-    const { history } = req.body;
-    const API_KEY = process.env.GEMINI_API_KEY;
-
-    // URL v1beta pour Gemini 1.5 Flash
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-
-    const response = await axios.post(url, {
-      contents: history
-    });
-
-    const aiText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!aiText) {
-      return res.status(500).json({ error: "L'IA n'a pas renvoyé de texte." });
-    }
-
-    res.json({ text: aiText });
-
-  } catch (err) {
-    console.error("❌ Erreur Gemini :", err.response?.data || err.message);
-    res.status(500).json({ error: "Erreur de communication avec l'IA" });
-  }
+// Configuration Gemini
+const genAI = new GoogleGenerativeAI("VOTRE_CLE_API_GEMINI");
+const model = genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+    systemInstruction: "Tu es un assistant de commande. Demande le Nom, le Produit et la Ville. Une fois fini, envoie un récapitulatif."
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Serveur actif sur le port ${PORT}`));
+// Historique en mémoire (pour cet exemple simple)
+let chatSession = model.startChat({ history: [] });
+
+app.post('/chat', async (req, res) => {
+    try {
+        const userMsg = req.body.message;
+        const result = await chatSession.sendMessage(userMsg);
+        const responseText = result.response.text();
+        
+        res.json({ reply: responseText });
+    } catch (error) {
+        res.status(500).json({ reply: "Erreur de connexion à l'IA." });
+    }
+});
+
+app.listen(3000, () => console.log("Serveur lancé sur http://localhost:3000"));
