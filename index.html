@@ -6,21 +6,205 @@
     <title>ZakaSania | Excellence en Propreté</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- NAVIGATION & MENU TOGGLE --- */
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background: white;
+            z-index: 2000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .menu-toggle {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 3000;
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 28px;
+            height: 3px;
+            background: #2f3640;
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100%;
+            background: #1e272e;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2500;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+        }
+
+        .sidebar.active { right: 0; }
+        .sidebar-content { padding-top: 100px; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar ul li { padding: 10px 30px; }
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .sidebar ul li a:hover { color: #00a8ff; padding-left: 10px; }
+
+        .sidebar-footer {
+            padding: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .btn-close-menu {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            width: 100%;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            transition: 0.3s;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            z-index: 2400;
+        }
+        .overlay.active { display: block; }
+
+        /* --- OVERLAY D'INSCRIPTION (NOUVEAU) --- */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            display: none; /* Affiché via JS */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-modal {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .auth-modal h2 { margin-bottom: 10px; font-size: 1.5rem; }
+        .auth-modal span { color: #00a8ff; }
+        .auth-modal input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .btn-auth {
+            width: 100%;
+            background: #00a8ff;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        /* --- ASSISTANT FLOTTANT --- */
+        .ai-floating-button { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+        .ai-btn {
+            display: flex; align-items: center; gap: 10px;
+            background: #1e272e; color: white; text-decoration: none;
+            padding: 12px 20px; border-radius: 50px; font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: 0.3s;
+            border: 1px solid #00a8ff;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="container">
-            <div class="logo">Zaka<span>Sania</span></div>
-            <ul class="nav-links">
-                <li><a href="#accueil">Accueil</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#" class="btn-nav">Contact</a></li>
-            </ul>
-        </nav>
+
+    <div id="auth-overlay" class="auth-overlay">
+        <div class="auth-modal">
+            <h2>Bienvenue chez <span>ZakaSania</span></h2>
+            <p>Enregistrez-vous pour accéder à nos services de propreté.</p>
+            <form id="registrationForm">
+                <input type="text" id="userName" placeholder="Votre Nom d'utilisateur" required>
+                <input type="tel" id="userPhone" placeholder="Votre numéro WhatsApp" required>
+                <button type="submit" id="regBtn" class="btn-auth">Commencer</button>
+            </form>
+        </div>
+    </div>
+    
+    <header class="header-nav">
+        <div class="logo">Zaka<span>Sania</span></div>
+        <div class="menu-toggle" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </header>
 
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <ul>
+                <li><a href="#accueil" onclick="closeMenu()">Accueil</a></li>
+                <li><a href="#services" onclick="closeMenu()">Nos Services</a></li>
+                <li><a href="avis.html">Avis Clients ⭐</a></li>
+                <li><a href="assistant.html" style="color: #00a8ff;">Assistant IA ✨</a></li>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            <button onclick="closeMenu()" class="btn-close-menu">
+                <span style="color:white">← Retour</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
     <main>
-        <section id="accueil" class="hero">
+        <section id="accueil" class="hero" style="padding-top: 120px;">
             <div class="hero-content">
                 <h1>Une maison saine, <br>un esprit serein avec <span>ZakaSania</span></h1>
                 <p>Le meilleur du nettoyage professionnel au Burkina Faso.</p>
@@ -31,99 +215,112 @@
         <section id="services" class="container">
             <h2 class="section-title">Quel service recherchez-vous ?</h2>
             <div class="services-grid">
-                
                 <a href="a.html" class="service-block-link">
                     <div class="icon">🧺</div>
                     <h3>Lessive</h3>
                     <p>Vêtements, linge de maison et repassage.</p>
-                    <div class="action-btn">Demander ce service</div>
+                    <div class="action-btn">Commander</div>
                 </a>
-
                 <a href="b.html" class="service-block-link">
                     <div class="icon">🏠</div>
                     <h3>Maisons & Locaux</h3>
                     <p>Entretien complet et fin de chantier.</p>
-                    <div class="action-btn">Demander ce service</div>
+                    <div class="action-btn">Commander</div>
                 </a>
-
                 <a href="c.html" class="service-block-link">
                     <div class="icon">🍽️</div>
                     <h3>Cuisine & Vaisselle</h3>
                     <p>Nettoyage approfondi et aide ménagère.</p>
-                    <div class="action-btn">Demander ce service</div>
+                    <div class="action-btn">Commander</div>
                 </a>
-
                 <a href="d.html" class="service-block-link">
                     <div class="icon">✨</div>
                     <h3>Autres</h3>
                     <p>Demandes spécifiques et sur-mesure.</p>
-                    <div class="action-btn">Demander ce service</div>
+                    <div class="action-btn">Commander</div>
                 </a>
-
             </div>
-            <div class="ai-floating-button">
-    <a href="IA.html" class="ai-btn">
-        <span class="ai-icon">✨</span>
-        <span class="ai-text">Assistant IA</span>
-    </a>
-</div>
-
-<style>
-    .ai-floating-button {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1000;
-    }
-
-    .ai-btn {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: linear-gradient(135deg, #1e272e 0%, #2f3640 100%);
-        color: white;
-        text-decoration: none;
-        padding: 12px 20px;
-        border-radius: 50px;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        font-size: 0.9rem;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        border: 1px solid rgba(0, 168, 255, 0.3);
-        transition: 0.3s;
-    }
-
-    .ai-btn:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0, 168, 255, 0.2);
-        border-color: #00a8ff;
-    }
-
-    .ai-icon {
-        font-size: 1.2rem;
-        animation: spark 2s infinite;
-    }
-
-    @keyframes spark {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.7; transform: scale(1.2); }
-    }
-
-    /* Masquer le bouton sur les petits écrans si nécessaire ou le centrer */
-    @media (max-width: 480px) {
-        .ai-btn {
-            padding: 10px 15px;
-            font-size: 0.8rem;
-        }
-    }
-</style>
         </section>
     </main>
+
+    <div class="ai-floating-button">
+        <a href="assistant.html" class="ai-btn">
+            <span>✨</span>
+            <span>Assistant IA</span>
+        </a>
+    </div>
 
     <footer>
         <div class="container">
             <p>&copy; 2025 ZakaSania - Services de Nettoyage Professionnel.</p>
         </div>
     </footer>
+
+    <script>
+        // --- LOGIQUE D'INSCRIPTION MONGODB ---
+        const authOverlay = document.getElementById('auth-overlay');
+        const regForm = document.getElementById('registrationForm');
+
+        // Vérification au chargement
+        window.addEventListener('load', () => {
+            if (!localStorage.getItem('zakaUser')) {
+                authOverlay.style.display = 'flex';
+            }
+        });
+
+        regForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('regBtn');
+            const name = document.getElementById('userName').value;
+            const phone = document.getElementById('userPhone').value;
+
+            btn.innerText = "Chargement...";
+            btn.disabled = true;
+
+            try {
+                // Appel à ton API sur Render
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('zakaUser', name);
+                    localStorage.setItem('zakaPhone', phone);
+                    authOverlay.style.display = 'none';
+                    alert(`Bienvenue ${name} !`);
+                } else {
+                    alert("Erreur lors de l'enregistrement. Réessayez.");
+                    btn.innerText = "Commencer";
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erreur de connexion au serveur.");
+                btn.innerText = "Commencer";
+                btn.disabled = false;
+            }
+        });
+
+        // --- LOGIQUE SIDEBAR ---
+        const menuToggle = document.getElementById('mobile-menu');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        function closeMenu() {
+            menuToggle.classList.remove('active');
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+    </script>
 </body>
 </html>
