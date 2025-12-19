@@ -21,7 +21,7 @@ async function getDB() {
     try {
       await client.connect();
       // On force le nom de la base pour être certain de ne pas écrire dans 'test' par défaut
-      db = client.db("zakasania_db"); 
+      db = client.db("fasopropre_ai"); 
       console.log("✅ Connecté à MongoDB Atlas");
     } catch (err) {
       console.error("❌ Erreur de connexion MongoDB:", err.message);
