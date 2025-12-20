@@ -105,6 +105,63 @@ app.use(express.static(__dirname));
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 app.get("/assistant.html", (req, res) => res.sendFile(path.join(__dirname, "assistant.html")));
 app.get("/avis.html", (req, res) => res.sendFile(path.join(__dirname, "avis.html")));
+// Route de connexion (vérification du numéro)
+app.post("/api/login", async (req, res) => {
+  try {
+    const database = await getDB();
+    const { phone } = req.body;
+    
+    // On cherche le client dans la collection
+    const client = await database.collection("clients").findOne({ phone: phone.trim() });
+
+    if (client) {
+      console.log(`✅ Connexion réussie pour : ${client.name}`);
+      res.json({ success: true, name: client.name });
+    } else {
+      res.status(404).json({ success: false, message: "Client non trouvé" });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+// --- API AVIS CLIENTS ---
+
+// 1. Enregistrer un avis
+app.post("/api/reviews", async (req, res) => {
+  try {
+    const database = await getDB();
+    const { name, phone, rating, comment } = req.body;
+    
+    await database.collection("reviews").insertOne({
+      name,
+      phone,
+      rating,
+      comment,
+      createdAt: new Date()
+    });
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
+// 2. Récupérer tous les avis
+app.get("/api/reviews", async (req, res) => {
+  try {
+    const database = await getDB();
+    // On récupère les 20 derniers avis, du plus récent au plus ancien
+    const reviews = await database.collection("reviews")
+      .find()
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .toArray();
+    
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ error: "Erreur lors du chargement des avis" });
+  }
+});
 
 // --- Server ---
 const PORT = process.env.PORT || 3000;

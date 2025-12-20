@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avis Clients | ZakaSania</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #f8f9fa; margin-top: 80px; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        
+        /* --- SECTION AJOUT AVIS --- */
+        .add-review-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+        }
+        .user-badge {
+            background: #e1f5fe;
+            color: #00a8ff;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        /* --- SYSTÈME D'ÉTOILES --- */
+        .stars-input {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+        .stars-input input { display: none; }
+        .stars-input label {
+            font-size: 2rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .stars-input input:checked ~ label,
+        .stars-input label:hover,
+        .stars-input label:hover ~ label { color: #f1c40f; }
+
+        textarea {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 15px;
+            font-family: inherit;
+            resize: none;
+            height: 100px;
+            margin-bottom: 15px;
+        }
+
+        .btn-submit-review {
+            background: #00a8ff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* --- LISTE DES AVIS --- */
+        .review-item {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid #00a8ff;
+        }
+        .review-header { display: flex; justify-content: space-between; align-items: center; }
+        .review-name { font-weight: 700; color: #2f3640; }
+        .review-stars { color: #f1c40f; }
+        .review-text { color: #7f8c8d; margin-top: 10px; font-size: 0.95rem; }
+        .review-date { font-size: 0.75rem; color: #bdc3c7; margin-top: 10px; }
+
+        .back-nav { position: fixed; top: 20px; left: 20px; text-decoration: none; color: #2f3640; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-nav">← Retour</a>
+
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 30px;">Ce que pensent nos <span>Clients</span></h1>
+
+        <div class="add-review-card">
+            <div id="user-info">
+                <span class="user-badge" id="display-name">Chargement...</span>
+            </div>
+            <h3>Laissez votre avis</h3>
+            <form id="reviewForm">
+                <div class="stars-input">
+                    <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
+                    <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+                    <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+                    <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+                    <input type="radio" id="star1" name="rating" value="1" required><label for="star1">★</label>
+                </div>
+                <textarea id="comment" placeholder="Racontez-nous votre expérience avec ZakaSania..." required></textarea>
+                <button type="submit" class="btn-submit-review" id="submitBtn">Publier mon avis</button>
+            </form>
+        </div>
+
+        <hr style="border: 0; height: 1px; background: #eee; margin: 40px 0;">
+
+        <div id="reviews-list">
+            <p style="text-align: center; color: #999;">Chargement des avis...</p>
+        </div>
+    </div>
+
+    <script>
+        const userName = localStorage.getItem('zakaUser');
+        const userPhone = localStorage.getItem('zakaPhone');
+
+        // 1. Vérifier si l'utilisateur est connecté
+        if (!userName || !userPhone) {
+            alert("Veuillez vous identifier sur la page d'accueil avant de laisser un avis.");
+            window.location.href = "index.html";
+        } else {
+            document.getElementById('display-name').innerText = "Connecté en tant que : " + userName;
+        }
+
+        // 2. Charger les avis existants au démarrage
+        async function loadReviews() {
+            try {
+                const res = await fetch('/api/reviews');
+                const reviews = await res.json();
+                const list = document.getElementById('reviews-list');
+                
+                if (reviews.length === 0) {
+                    list.innerHTML = "<p style='text-align: center; color: #999;'>Aucun avis pour le moment. Soyez le premier !</p>";
+                    return;
+                }
+
+                list.innerHTML = reviews.map(rev => `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="review-name">${rev.name}</span>
+                            <span class="review-stars">${"★".repeat(rev.rating)}${"☆".repeat(5-rev.rating)}</span>
+                        </div>
+                        <p class="review-text">${rev.comment}</p>
+                        <div class="review-date">Publié le ${new Date(rev.createdAt).toLocaleDateString('fr-FR')}</div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error("Erreur chargement avis:", err);
+            }
+        }
+
+        loadReviews();
+
+        // 3. Envoyer un nouvel avis
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const rating = document.querySelector('input[name="rating"]:checked').value;
+            const comment = document.getElementById('comment').value;
+
+            submitBtn.innerText = "Publication...";
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: userName,
+                        phone: userPhone,
+                        rating: parseInt(rating),
+                        comment: comment
+                    })
+                });
+
+                if (response.ok) {
+                    alert("Merci ! Votre avis a été publié.");
+                    document.getElementById('comment').value = "";
+                    loadReviews(); // Recharger la liste
+                } else {
+                    alert("Erreur lors de la publication.");
+                }
+            } catch (err) {
+                alert("Erreur réseau.");
+            } finally {
+                submitBtn.innerText = "Publier mon avis";
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -102,7 +102,7 @@
         }
         .overlay.active { display: block; }
 
-        /* --- OVERLAY D'INSCRIPTION (NOUVEAU) --- */
+        /* --- OVERLAY D'INSCRIPTION & CONNEXION --- */
         .auth-overlay {
             position: fixed;
             top: 0;
@@ -111,7 +111,7 @@
             height: 100%;
             background: rgba(0,0,0,0.95);
             z-index: 9999;
-            display: none; /* Affiché via JS */
+            display: none;
             align-items: center;
             justify-content: center;
         }
@@ -151,6 +151,18 @@
             margin-top: 15px;
         }
 
+        .toggle-link {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .toggle-link b {
+            color: #00a8ff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
         /* --- ASSISTANT FLOTTANT --- */
         .ai-floating-button { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
         .ai-btn {
@@ -166,13 +178,18 @@
 
     <div id="auth-overlay" class="auth-overlay">
         <div class="auth-modal">
-            <h2>Bienvenue chez <span>ZakaSania</span></h2>
-            <p>Enregistrez-vous pour accéder à nos services de propreté.</p>
-            <form id="registrationForm">
+            <h2 id="auth-title">Bienvenue chez <span>ZakaSania</span></h2>
+            <p id="auth-desc">Enregistrez-vous pour accéder à nos services.</p>
+            
+            <form id="authForm">
                 <input type="text" id="userName" placeholder="Votre Nom d'utilisateur" required>
                 <input type="tel" id="userPhone" placeholder="Votre numéro WhatsApp" required>
-                <button type="submit" id="regBtn" class="btn-auth">Commencer</button>
+                <button type="submit" id="authBtn" class="btn-auth">Commencer</button>
             </form>
+
+            <p class="toggle-link" id="auth-toggle-text">
+                Déjà inscrit ? <b onclick="toggleAuthMode()">Connectez-vous ici</b>
+            </p>
         </div>
     </div>
     
@@ -257,50 +274,79 @@
     </footer>
 
     <script>
-        // --- LOGIQUE D'INSCRIPTION MONGODB ---
+        // --- LOGIQUE D'AUTH (INSCRIPTION / CONNEXION) ---
         const authOverlay = document.getElementById('auth-overlay');
-        const regForm = document.getElementById('registrationForm');
+        const authForm = document.getElementById('authForm');
+        const userNameInput = document.getElementById('userName');
+        const authTitle = document.getElementById('auth-title');
+        const authDesc = document.getElementById('auth-desc');
+        const authBtn = document.getElementById('authBtn');
+        const authToggleText = document.getElementById('auth-toggle-text');
 
-        // Vérification au chargement
+        let isLoginMode = false;
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            if (isLoginMode) {
+                authTitle.innerHTML = "Heureux de vous <span>revoir</span>";
+                authDesc.innerText = "Entrez votre numéro WhatsApp pour vous connecter.";
+                userNameInput.style.display = "none";
+                userNameInput.required = false;
+                authBtn.innerText = "Se connecter";
+                authToggleText.innerHTML = "Nouveau ici ? <b onclick='toggleAuthMode()'>Créez un compte</b>";
+            } else {
+                authTitle.innerHTML = "Bienvenue chez <span>ZakaSania</span>";
+                authDesc.innerText = "Enregistrez-vous pour accéder à nos services.";
+                userNameInput.style.display = "block";
+                userNameInput.required = true;
+                authBtn.innerText = "Commencer";
+                authToggleText.innerHTML = "Déjà inscrit ? <b onclick='toggleAuthMode()'>Connectez-vous ici</b>";
+            }
+        }
+
         window.addEventListener('load', () => {
             if (!localStorage.getItem('zakaUser')) {
                 authOverlay.style.display = 'flex';
             }
         });
 
-        regForm.addEventListener('submit', async (e) => {
+        authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('regBtn');
-            const name = document.getElementById('userName').value;
+            const btn = document.getElementById('authBtn');
+            const name = userNameInput.value;
             const phone = document.getElementById('userPhone').value;
 
-            btn.innerText = "Chargement...";
+            btn.innerText = "Vérification...";
             btn.disabled = true;
 
+            // Déterminer l'URL selon le mode
+            const endpoint = isLoginMode ? '/api/login' : '/api/register';
+            const payload = isLoginMode ? { phone } : { name, phone };
+
             try {
-                // Appel à ton API sur Render
-                const response = await fetch('/api/register', {
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, phone })
+                    body: JSON.stringify(payload)
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    localStorage.setItem('zakaUser', name);
+                    // Si connexion, le serveur renvoie le nom stocké dans la DB
+                    const finalName = data.name || name;
+                    localStorage.setItem('zakaUser', finalName);
                     localStorage.setItem('zakaPhone', phone);
                     authOverlay.style.display = 'none';
-                    alert(`Bienvenue ${name} !`);
+                    alert(`Ravi de vous voir, ${finalName} !`);
                 } else {
-                    alert("Erreur lors de l'enregistrement. Réessayez.");
-                    btn.innerText = "Commencer";
+                    alert(isLoginMode ? "Numéro non reconnu. Veuillez vous inscrire." : "Erreur lors de l'enregistrement.");
                     btn.disabled = false;
+                    btn.innerText = isLoginMode ? "Se connecter" : "Commencer";
                 }
             } catch (err) {
                 console.error(err);
                 alert("Erreur de connexion au serveur.");
-                btn.innerText = "Commencer";
                 btn.disabled = false;
             }
         });
